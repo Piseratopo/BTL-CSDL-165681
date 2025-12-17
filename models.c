@@ -32,8 +32,8 @@ Alarm* createAlarm(int id, const char* tag, const char* time, int priority, cons
  */
 void inputAlarm(Alarm** head) {
    int id, priority;
-   char buffer[128];          // general input buffer
-   char tag[20], time[20], description[100];
+   char buffer[256];          // general input buffer
+   char tag[MAX_TAG_LENGTH], time[MAX_TIME_LENGTH], description[MAX_DESCRIPTION_LENGTH];
 
    printf("Alarm's ID: ");
    if (fgets(buffer, sizeof(buffer), stdin)) {

@@ -9,7 +9,7 @@ int main() {
    inputAlarm(&alarmList);
 
    // Print all alarms
-   printf("\nDanh sách Alarm:\n");
+   printf("\nAlarm list:\n");
    printAlarms(alarmList);
 
    return 0;
