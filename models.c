@@ -3,23 +3,26 @@
 #include <string.h>
 #include "models.h"
 
-// Create a new alarm node
-Alarm* createAlarm(int id, const char* tag, const char* time, int priority, const char* description) {
-   Alarm* newAlarm = (Alarm*)malloc(sizeof(Alarm));
-   if (!newAlarm) {
+Sample* createSample(const char* timestamp, const char* tag, double value, const char* unit) {
+   Sample* newSample = (Sample*)malloc(sizeof(Sample));
+   if (!newSample) {
       printf("Memory allocation failed!\n");
       return NULL;
    }
-   newAlarm->id = id;
-   strncpy(newAlarm->tag, tag, sizeof(newAlarm->tag) - 1);
-   newAlarm->tag[sizeof(newAlarm->tag) - 1] = '\0';
-   strncpy(newAlarm->time, time, sizeof(newAlarm->time) - 1);
-   newAlarm->time[sizeof(newAlarm->time) - 1] = '\0';
-   newAlarm->priority = priority;
-   strncpy(newAlarm->description, description, sizeof(newAlarm->description) - 1);
-   newAlarm->description[sizeof(newAlarm->description) - 1] = '\0';
-   newAlarm->next = NULL;
-   return newAlarm;
+
+   strncpy(newSample->timestamp, timestamp, sizeof(newSample->timestamp) - 1);
+   newSample->timestamp[sizeof(newSample->timestamp) - 1] = '\0';
+
+   strncpy(newSample->tag, tag, sizeof(newSample->tag) - 1);
+   newSample->tag[sizeof(newSample->tag) - 1] = '\0';
+
+   newSample->value = value;
+
+   strncpy(newSample->unit, unit, sizeof(newSample->unit) - 1);
+   newSample->unit[sizeof(newSample->unit) - 1] = '\0';
+
+   newSample->next = NULL;
+   return newSample;
 }
 
 /**
@@ -30,50 +33,43 @@ Alarm* createAlarm(int id, const char* tag, const char* time, int priority, cons
  *
  * @param head A pointer to the head of the linked list.
  */
-void inputAlarm(Alarm** head) {
-   int id, priority;
-   char buffer[256];          // general input buffer
-   char tag[MAX_TAG_LENGTH], time[MAX_TIME_LENGTH], description[MAX_DESCRIPTION_LENGTH];
+void inputSample(Sample** head) {
+   char timestamp[MAX_TIMESTAMP_LENGTH];
+   char tag[MAX_TAG_LENGTH];
+   char unit[MAX_UNIT_LENGTH];
+   char buffer[256];
+   double value = 0.0;
 
-   printf("Alarm's ID: ");
-   if (fgets(buffer, sizeof(buffer), stdin)) {
-      id = (int)strtol(buffer, NULL, 10);
+   printf("Timestamp (YYYY-MM-DD HH:MM): ");
+   if (fgets(timestamp, sizeof(timestamp), stdin)) {
+      timestamp[strcspn(timestamp, "\n")] = '\0';
    }
 
-   printf("Tag (device name or channel): ");
+   printf("Tag (e.g., T1, P2): ");
    if (fgets(tag, sizeof(tag), stdin)) {
-      // remove newline character from end of string
       tag[strcspn(tag, "\n")] = '\0';
    }
 
-   printf("Time of occurrence: ");
-   if (fgets(time, sizeof(time), stdin)) {
-      time[strcspn(time, "\n")] = '\0';
-   }
-
-   printf("Priority (1: high, 2: medium, 3: low): ");
+   printf("Value: ");
    if (fgets(buffer, sizeof(buffer), stdin)) {
-      priority = (int)strtol(buffer, NULL, 10);
+      value = strtod(buffer, NULL);
    }
 
-   printf("Short description: ");
-   if (fgets(description, sizeof(description), stdin)) {
-      description[strcspn(description, "\n")] = '\0';
+   printf("Unit (e.g., V, A, bar): ");
+   if (fgets(unit, sizeof(unit), stdin)) {
+      unit[strcspn(unit, "\n")] = '\0';
    }
 
-   // create a new alarm node and add to linked list
-   Alarm* newAlarm = createAlarm(id, tag, time, priority, description);
+   Sample* newSample = createSample(timestamp, tag, value, unit);
 
    if (*head == NULL) {
-      // if list is empty, set new alarm as head
-      *head = newAlarm;
+      *head = newSample;
    } else {
-      Alarm* temp = *head;
-      // traverse list to find last node and append new node
+      Sample* temp = *head;
       while (temp->next != NULL) {
          temp = temp->next;
       }
-      temp->next = newAlarm;
+      temp->next = newSample;
    }
 }
 
@@ -85,17 +81,14 @@ void inputAlarm(Alarm** head) {
  *
  * @param head A pointer to the head of the linked list.
  */
-void printAlarms(const Alarm* head) {
-   const Alarm* temp = head;
+void printSamples(const Sample* head) {
+   const Sample* temp = head;
    while (temp != NULL) {
-      // print alarm details
-      printf("ID: %d\n", temp->id);
+      printf("Timestamp: %s\n", temp->timestamp);
       printf("Tag: %s\n", temp->tag);
-      printf("Time: %s\n", temp->time);
-      printf("Priority: %d\n", temp->priority);
-      printf("Description: %s\n", temp->description);
+      printf("Value: %.2f\n", temp->value);
+      printf("Unit: %s\n", temp->unit);
       printf("---------------------------\n");
-      // move to next alarm in list
       temp = temp->next;
    }
 }

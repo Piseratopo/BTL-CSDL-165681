@@ -2,15 +2,15 @@
 #include "models.h"
 
 int main() {
-   Alarm* alarmList = NULL;
+   Sample* sampleList = NULL;
 
-   // Input 2 alarms
-   inputAlarm(&alarmList);
-   inputAlarm(&alarmList);
+   // Input 2 samples
+   inputSample(&sampleList);
+   inputSample(&sampleList);
 
-   // Print all alarms
-   printf("\nAlarm list:\n");
-   printAlarms(alarmList);
+   // Print all samples
+   printf("\nSample list:\n");
+   printSamples(sampleList);
 
    return 0;
 }
