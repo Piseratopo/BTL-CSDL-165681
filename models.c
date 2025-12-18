@@ -3,6 +3,17 @@
 #include <string.h>
 #include "models.h"
 
+static Sample* duplicateSampleNode(const Sample* sample) {
+   Sample* newNode = (Sample*)malloc(sizeof(Sample));
+   if (!newNode) {
+      printf("Memory allocation failed!\n");
+      exit(EXIT_FAILURE);
+   }
+   *newNode = *sample;
+   newNode->next = NULL;
+   return newNode;
+}
+
 Sample* createSample(const char* timestamp, const char* tag, double value, const char* unit) {
    Sample* newSample = (Sample*)malloc(sizeof(Sample));
    if (!newSample) {
@@ -91,4 +102,47 @@ void printSamples(const Sample* head) {
       printf("---------------------------\n");
       temp = temp->next;
    }
+}
+
+void addSample(Sample** head, Sample sample) {
+   Sample* newNode = duplicateSampleNode(&sample);
+   if (*head == NULL) {
+      *head = newNode;
+      return;
+   }
+
+   Sample* current = *head;
+   while (current->next != NULL) {
+      current = current->next;
+   }
+   current->next = newNode;
+}
+
+void printSampleList(const Sample* head) {
+   printf("\n%-20s %-10s %-10s %-10s\n", "Thoi gian", "Tag", "Gia tri", "Don vi");
+   printf("----------------------------------------------------------\n");
+   const Sample* current = head;
+   while (current != NULL) {
+      printf("%-20s %-10s %-10.2f %-10s\n",
+            current->timestamp,
+            current->tag,
+            current->value,
+            current->unit);
+      current = current->next;
+   }
+   printf("----------------------------------------------------------\n");
+}
+
+void freeSampleList(Sample** head) {
+   if (!head || !*head) {
+      return;
+   }
+
+   Sample* current = *head;
+   while (current != NULL) {
+      Sample* nextNode = current->next;
+      free(current);
+      current = nextNode;
+   }
+   *head = NULL;
 }

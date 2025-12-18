@@ -6,7 +6,8 @@
 #include <string.h>
 
 #define MAX_TAG_LENGTH 30
-#define MAX_TIME_LENGTH 50
+#define MAX_TIMESTAMP_LENGTH 50
+#define MAX_UNIT_LENGTH 16
 #define MAX_DESCRIPTION_LENGTH 200
 
 typedef struct Sample {
@@ -20,14 +21,8 @@ typedef struct Sample {
 Sample* createSample(const char* timestamp, const char* tag, double value, const char* unit);
 void    inputSample(Sample** head);
 void    printSamples(const Sample* head);
-
-//Định nghĩa cấu trúc mẫu dữ liệu (THANH TUNG 20232601)
-
-typedef struct {
-    char timestamp[20];
-    char tag[10];
-    double value;
-    char unit[10];
-} Sample;
+void    addSample(Sample** head, Sample sample);
+void    printSampleList(const Sample* head);
+void    freeSampleList(Sample** head);
 
 #endif
