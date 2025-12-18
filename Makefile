@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -std=c23 -Wall -Wextra -O2
 
 # Target executable
-TARGET = alarm_app
+TARGET = sensor_app
 
 # Source files
 SRCS = main.c models.c
