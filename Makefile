@@ -1,11 +1,11 @@
 CC      = gcc
-CFLAGS  = -std=c23 -Wall -Wextra -O2
+CFLAGS  = -Wall -Wextra -O2
 
 # Application and test targets
 APP_TARGET  = sensor_app
 TEST_TARGET = sensor_test
 
-COMMON_SRCS = models.c sort.c tree.c
+COMMON_SRCS = models.c sort.c tree.c menu.c
 APP_SRCS    = main.c
 TEST_SRCS   = test.c
 
