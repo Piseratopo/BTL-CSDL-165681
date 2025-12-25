@@ -30,3 +30,23 @@ void sortByValue(Sample arr[], int n) {
       }
    }
 }
+void sortSamplesByTag(Sample arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++) {
+            if (strcmp(arr[i].tag, arr[j].tag) > 0) {
+                Sample tmp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = tmp;
+            }
+        }
+    }
+}
+int listToArray(Node *head, Sample arr[], int max) {
+    int i = 0;
+    while (head != NULL && i < max) {
+        arr[i++] = head->data;
+        head = head->next;
+    }
+    return i;
+}
+

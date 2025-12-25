@@ -42,3 +42,14 @@ void inorderPrint(TreeNode *root) {
            root->data.unit);
     inorderPrint(root->right);
 }
+TreeNode* buildBSTFromList(Node *head) {
+    TreeNode *root = NULL;
+    Node *cur = head;
+
+    while (cur != NULL) {
+        root = insertBST(root, cur->data);
+        cur = cur->next;
+    }
+
+    return root;
+}
