@@ -77,23 +77,24 @@ void searchSamplesMenu(Sample* sampleList, TreeNode* root) {
 
     int choice;
     printf("\n=== SEARCH SAMPLES ===\n");
-    printf("1. Search by Tag (List all history)\n");
-    printf("2. Search by Time Range\n");            
+    printf("1. Search by Tag (History - Linear Search) \n"); // Cách 1: Tìm hết lịch sử
+    printf("2. Search by Time Range (Linear Search)    \n"); // Cách 2: Tìm theo giờ
+    printf("3. Quick Lookup by Tag (BST Search)        \n"); // Cách 3: Tìm nhanh (BST)
     printf("Enter your choice: ");
     scanf("%d", &choice);
-    getchar();
+    getchar(); 
 
-    char buffer[100];
+    char buffer[100]; 
 
     switch (choice) {
         case 1: 
-            printf("Enter Tag to search: ");
+            printf("Enter Tag to view history: ");
             fgets(buffer, sizeof(buffer), stdin);
             buffer[strcspn(buffer, "\n")] = '\0';
-            searchLinearByTag(sampleList, buffer);
+            searchLinearByTag(sampleList, buffer); 
             break;
 
-        case 2: 
+        case 2:
             {
                 char start[MAX_TIMESTAMP_LENGTH], end[MAX_TIMESTAMP_LENGTH];
                 printf("Enter START time (YYYY-MM-DD HH:MM): ");
@@ -107,6 +108,29 @@ void searchSamplesMenu(Sample* sampleList, TreeNode* root) {
                 searchByTimeRange(sampleList, start, end);
             }
             break;
+
+        case 3: 
+            if (root == NULL) {
+                printf("Error: BST not built yet. Please choose option 5 in Main Menu first.\n");
+            } else {
+                printf("Enter Tag to lookup (BST): ");
+                fgets(buffer, sizeof(buffer), stdin);
+                buffer[strcspn(buffer, "\n")] = '\0';
+                
+              
+                TreeNode* result = searchBST(root, buffer);
+                
+                if (result != NULL) {
+                    printf("\n[BST Found] Device exists in system:\n");
+                    printf("Timestamp: %s | Tag: %s | Value: %.2f %s\n", 
+                           result->data.timestamp, result->data.tag, 
+                           result->data.value, result->data.unit);
+                } else {
+                    printf("\n[BST Result] Tag '%s' not found in tree.\n", buffer);
+                }
+            }
+            break;
+
         default:
             printf("Invalid choice.\n");
     }

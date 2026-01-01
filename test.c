@@ -1,139 +1,163 @@
-#include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "models.h"
 #include "sort.h"
 #include "tree.h"
 
-static void printSampleArray(const char* title, const Sample* arr, int n) {
-   printf("%s\n", title);
-   for (int i = 0; i < n; ++i) {
-      printf("%-16s %-3s %6.2f %-6s\n",
-             arr[i].timestamp,
-             arr[i].tag,
-             arr[i].value,
-             arr[i].unit);
-   }
-   printf("---------------------------\n");
+// --- UTILITIES ---
+void printHeader(const char* title) {
+    printf("\n==========================================================\n");
+    printf("   %s\n", title);
+    printf("==========================================================\n");
 }
 
-static void runSortingAndTreeDemo(void) {
-   Sample samples[] = {
-      {"2025-12-12 10:30", "T1", 30.5, "C", NULL},
-      {"2025-12-12 10:35", "P1",  1.2, "bar", NULL},
-      {"2025-12-12 10:32", "T2", 28.1, "C", NULL},
-      {"2025-12-12 10:31", "T1", 31.0, "C", NULL},
-      {"2025-12-12 10:33", "I3", 15.0, "A", NULL},
-   };
-   const int count = (int)(sizeof(samples) / sizeof(samples[0]));
-
-   printSampleArray("=== ORIGINAL ORDER ===", samples, count);
-
-   Sample byTimestamp[count];
-   Sample byValue[count];
-   memcpy(byTimestamp, samples, sizeof(samples));
-   memcpy(byValue, samples, sizeof(samples));
-
-   sortByTimestamp(byTimestamp, count);
-   printSampleArray("=== SORTED BY TIMESTAMP ===", byTimestamp, count);
-
-   sortByValue(byValue, count);
-   printSampleArray("=== SORTED BY VALUE ===", byValue, count);
-
-   TreeNode* root = NULL;
-   for (int i = 0; i < count; ++i) {
-      root = insertBST(root, samples[i]);
-   }
-
-   printf("=== INORDER BST (TAG ASC) ===\n");
-   inorderPrint(root);
-   printf("---------------------------\n");
-
-   const char* probeTag = "T1";
-   TreeNode* found = searchBST(root, probeTag);
-   if (found) {
-      printf("Found tag %s -> %s %.2f %s\n",
-             probeTag,
-             found->data.timestamp,
-             found->data.value,
-             found->data.unit);
-   } else {
-      printf("Tag %s not found in BST.\n", probeTag);
-   }
+void printSubHeader(const char* title) {
+    printf("\n--- %s ---\n", title);
 }
 
-static void runLoggerDemo(void) {
-   Sample* logger = NULL;
-   Sample dataset[] = {
-      {"2024-12-18 08:00", "TEMP_01", 30.5, "C", NULL},
-      {"2024-12-18 08:05", "PRES_01",  2.1, "bar", NULL},
-      {"2024-12-18 08:10", "VOLT_M", 220.0, "V", NULL},
-      {"2024-12-18 08:15", "TEMP_01", 31.2, "C", NULL},
-      {"2024-12-18 08:20", "PRES_01",  2.3, "bar", NULL},
-      {"2024-12-18 08:25", "VOLT_M", 219.5, "V", NULL},
-      {"2024-12-18 08:30", "TEMP_01", 32.0, "C", NULL},
-      {"2024-12-18 08:35", "PRES_01",  2.4, "bar", NULL},
-      {"2024-12-18 08:40", "VOLT_M", 221.0, "V", NULL},
-   };
-   const size_t count = sizeof(dataset) / sizeof(dataset[0]);
+// --- DATA GENERATION ---
+// Tạo bộ dữ liệu giả lập phong phú hơn (15 mẫu)
+void generateMockData(Sample** head) {
+    Sample dataset[] = {
+        // Cảm biến Nhiệt độ (TEMP_01) - 5 mẫu
+        {"2025-12-12 08:00", "TEMP_01", 25.5, "C", NULL},
+        {"2025-12-12 09:00", "TEMP_01", 26.0, "C", NULL},
+        {"2025-12-12 10:00", "TEMP_01", 28.5, "C", NULL}, // Đỉnh nhiệt
+        {"2025-12-12 11:00", "TEMP_01", 27.2, "C", NULL},
+        {"2025-12-12 12:00", "TEMP_01", 26.8, "C", NULL},
 
-   for (size_t i = 0; i < count; ++i) {
-      addSample(&logger, dataset[i]);
-   }
+        // Cảm biến Áp suất (PRES_01) - 4 mẫu
+        {"2025-12-12 08:05", "PRES_01",  1.2, "bar", NULL},
+        {"2025-12-12 09:05", "PRES_01",  2.5, "bar", NULL}, // Đỉnh áp
+        {"2025-12-12 10:05", "PRES_01",  1.8, "bar", NULL},
+        {"2025-12-12 11:05", "PRES_01",  1.1, "bar", NULL},
 
-   printSampleList(logger);
-   freeSampleList(&logger);
+        // Cảm biến Điện áp (VOLT_01) - 4 mẫu - Có sự cố sụt áp
+        {"2025-12-12 08:30", "VOLT_01", 220.0, "V", NULL},
+        {"2025-12-12 09:30", "VOLT_01", 219.5, "V", NULL},
+        {"2025-12-12 10:30", "VOLT_01", 180.0, "V", NULL}, // Sụt áp
+        {"2025-12-12 11:30", "VOLT_01", 221.0, "V", NULL},
+        
+        // Dữ liệu nhiễu/Lẻ tẻ
+        {"2025-12-12 10:15", "HUMID_02", 60.5, "%", NULL},
+        {"2025-12-13 01:00", "TEMP_01", 20.0, "C", NULL}  // Ngày hôm sau
+    };
+
+    size_t count = sizeof(dataset) / sizeof(dataset[0]);
+    for (size_t i = 0; i < count; ++i) {
+        addSample(head, dataset[i]);
+    }
+   printf("[INFO] Generated %d mock samples.\n", (int)count);
 }
 
-static void usage(const char* prog) {
-   printf("Usage: %s [all|logger|algo]\n", prog);
-   printf("   all    - run every demo (default)\n");
-   printf("   logger - run the linked-list logger demo only\n");
-   printf("   algo   - run sorting + tree demos only\n");
+// --- TEST SCENARIO 1: DATA MANAGEMENT (SV2 Focus) ---
+void test_CoreFeatures(Sample* head) {
+    printHeader("TEST SCENARIO 1: CORE FUNCTIONS & STATS (SV2)");
+
+    // 1. In danh sách gốc
+    printSubHeader("1. Full Data List (Linked List Traversal)");
+    printSampleList(head);
+
+    // 2. Test Tìm kiếm tuyến tính (Lịch sử đo)
+    printSubHeader("2. Linear Search by Tag (History)");
+    printf("[TEST] Searching for tag 'TEMP_01' (Expected: 6 records)...\n");
+    searchLinearByTag(head, "TEMP_01");
+
+    printf("\n[TEST] Searching for tag 'UNKNOWN' (Expected: Not found)...\n");
+    searchLinearByTag(head, "UNKNOWN");
+
+    // 3. Test Tìm kiếm theo khoảng thời gian
+    printSubHeader("3. Search by Time Range");
+    char* start = "2025-12-12 09:00";
+    char* end   = "2025-12-12 11:00";
+    printf("[TEST] Range: %s to %s\n", start, end);
+    searchByTimeRange(head, start, end);
+
+    // 4. Test Thống kê (Nâng cao)
+    printSubHeader("4. Statistics (Min/Max/Avg)");
+    printf("[TEST] Calculate stats for 'TEMP_01'...\n");
+    calculateStatsByTag(head, "TEMP_01");
+
+    printf("\n[TEST] Calculate stats for 'VOLT_01'...\n");
+    calculateStatsByTag(head, "VOLT_01");
 }
 
+// --- TEST SCENARIO 2: ALGORITHMS (SV3 Focus) ---
+void test_Algorithms(Sample* head) {
+    printHeader("TEST SCENARIO 2: ALGORITHMS & BST (SV3)");
+
+    // Chuẩn bị dữ liệu mảng để sort
+    int count = 0;
+    Sample* arr = listToArray(head, &count);
+    
+    // 1. Test Sorting
+    printSubHeader("1. Sorting Algorithms");
+    
+    // Clone mảng để test sort value
+    Sample* arrVal = (Sample*)malloc(count * sizeof(Sample));
+    memcpy(arrVal, arr, count * sizeof(Sample));
+
+    printf("[TEST] Sorting by Timestamp (Ascending)...\n");
+    sortByTimestamp(arr, count);
+    printf("Top 3 samples after sort:\n");
+    for(int i=0; i<3 && i<count; i++) printf("  %s - %s\n", arr[i].timestamp, arr[i].tag);
+
+    printf("\n[TEST] Sorting by Value (Ascending)...\n");
+    sortByValue(arrVal, count);
+    printf("Top 3 samples after sort (Min values):\n");
+    for(int i=0; i<3 && i<count; i++) printf("  %.2f - %s (%s)\n", arrVal[i].value, arrVal[i].tag, arrVal[i].timestamp);
+
+    // 2. Test BST
+    printSubHeader("2. Binary Search Tree (BST)");
+    TreeNode* root = buildBSTFromList(head);
+    printf("[TEST] BST Built. Performing In-order Traversal (Sorted by Tag)...\n");
+    inorderPrint(root);
+
+    // 3. Test BST Search
+    printSubHeader("3. BST Lookup (Quick Existence Check)");
+    char* targets[] = {"PRES_01", "HUMID_02", "GHOST_TAG"};
+    for (int i = 0; i < 3; i++) {
+        printf("Looking up '%s'... ", targets[i]);
+        TreeNode* res = searchBST(root, targets[i]);
+        if (res) printf("[FOUND] Val: %.2f\n", res->data.value);
+        else printf("[NOT FOUND]\n");
+    }
+
+    // Cleanup
+    free(arr);
+    free(arrVal);
+    // Lưu ý: Không free root ở đây để đơn giản hóa demo, OS sẽ dọn dẹp
+}
+
+// --- MAIN DRIVER ---
 int main(int argc, char* argv[]) {
-   int runLogger = 1;
-   int runAlgorithms = 1;
+    Sample* loggerHead = NULL;
+    
+    // 1. Setup Data
+    generateMockData(&loggerHead);
 
-   if (argc > 1) {
-      runLogger = 0;
-      runAlgorithms = 0;
+    int runPart1 = 1;
+    int runPart2 = 1;
 
-      for (int i = 1; i < argc; ++i) {
-         if (strcmp(argv[i], "logger") == 0) {
-            runLogger = 1;
-         } else if (strcmp(argv[i], "algo") == 0 || strcmp(argv[i], "algorithms") == 0) {
-            runAlgorithms = 1;
-         } else if (strcmp(argv[i], "all") == 0) {
-            runLogger = 1;
-            runAlgorithms = 1;
-            break;
-         } else {
-            usage(argv[0]);
-            return 1;
-         }
-      }
+    // Xử lý tham số dòng lệnh
+    if (argc > 1) {
+        if (strcmp(argv[1], "core") == 0) { runPart2 = 0; }
+        else if (strcmp(argv[1], "algo") == 0) { runPart1 = 0; }
+    }
 
-      if (!runLogger && !runAlgorithms) {
-         usage(argv[0]);
-         return 1;
-      }
-   }
+    // 2. Run Tests
+    if (runPart1) test_CoreFeatures(loggerHead);
+    if (runPart2) test_Algorithms(loggerHead);
 
-   if (runLogger) {
-      printf("=== DATA LOGGER LINKED LIST DEMO ===\n");
-      runLoggerDemo();
-   }
+    // 3. Cleanup List
+    freeSampleList(&loggerHead);
 
-   if (runAlgorithms) {
-      if (runLogger) {
-         putchar('\n');
-      }
-      printf("=== SORT & TREE DEMO ===\n");
-      runSortingAndTreeDemo();
-   }
+    // Giữ màn hình để xem kết quả
+    printf("\n==========================================================\n");
+    printf("Tests Completed. Press Enter to exit...");
+    getchar();
 
-   return 0;
+    return 0;
 }
