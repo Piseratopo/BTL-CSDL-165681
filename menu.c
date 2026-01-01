@@ -97,23 +97,12 @@ void sortSamplesMenu(Sample** sampleList) {
 
     // Convert linked list to array for sorting
     int count = 0;
-    Sample* current = *sampleList;
-    while (current != NULL) {
-        count++;
-        current = current->next;
-    }
-
-    if (count == 0) {
+    Sample* samples = listToArray(*sampleList, &count);
+    
+    if (samples == NULL || count == 0) {
         printf("No samples to sort.\n");
+        if (samples) free(samples);
         return;
-    }
-
-    Sample* samples = (Sample*)malloc(count * sizeof(Sample));
-    current = *sampleList;
-    for (int i = 0; i < count; i++) {
-        samples[i] = *current;
-        samples[i].next = NULL; // Break the linked list structure for sorting
-        current = current->next;
     }
 
     switch (choice) {

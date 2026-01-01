@@ -13,5 +13,6 @@ TreeNode* createTreeNode(Sample s);
 TreeNode* insertBST(TreeNode *root, Sample s);
 TreeNode* searchBST(TreeNode *root, const char *tag);
 void inorderPrint(TreeNode *root);
+TreeNode* buildBSTFromList(Sample *head);
 
 #endif

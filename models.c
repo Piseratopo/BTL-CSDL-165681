@@ -102,20 +102,6 @@ void addSample(Sample** head, Sample sample) {
    current->next = newNode;
 }
 
-void printSampleList(const Sample* head) {
-   printf("\n%-20s %-10s %-10s %-10s\n", "Thoi gian", "Tag", "Gia tri", "Don vi");
-   printf("----------------------------------------------------------\n");
-   const Sample* current = head;
-   while (current != NULL) {
-      printf("%-20s %-10s %-10.2f %-10s\n",
-            current->timestamp,
-            current->tag,
-            current->value,
-            current->unit);
-      current = current->next;
-   }
-   printf("----------------------------------------------------------\n");
-}
 
 void freeSampleList(Sample** head) {
    if (!head || !*head) {
@@ -132,120 +118,94 @@ void freeSampleList(Sample** head) {
 }
 
 
-// Tuan 2_ Tung
-
-//Tìm kiếm theo Tag
-void searchByTag(Sample* head, char* searchTag) {
-    printf("\n--- KET QUA TIM KIEM TAG: %s ---\n", searchTag);
-    printf("%-20s %-10s %-10s %-10s\n", "Thoi gian", "Tag", "Gia tri", "Don vi");
-    
-    int found = 0;
-    Sample* current = head;
-    
-    while (current != NULL) {
-        // So sánh trực tiếp tag
-        if (strcmp(current->tag, searchTag) == 0) {
-            printf("%-20s %-10s %-10.2f %-10s\n", 
-                   current->timestamp, 
-                   current->tag, 
-                   current->value, 
-                   current->unit);
-            found++;
-        }
-        current = current->next;
-    }
-    
-    if (found == 0) printf("(Khong tim thay ket qua nao)\n");
-}
-
-// Tìm kiếm theo khoảng thời gian
+// Search by time range
 void searchByTimeRange(Sample* head, char* startTime, char* endTime) {
-    printf("\n--- TIM KIEM TU %s DEN %s ---\n", startTime, endTime);
-    printf("%-20s %-10s %-10s %-10s\n", "Thoi gian", "Tag", "Gia tri", "Don vi");
+   printf("\n--- SEARCH FROM %s TO %s ---\n", startTime, endTime);
+   printf("%-20s %-10s %-10s %-10s\n", "Timestamp", "Tag", "Value", "Unit");
 
-    int found = 0;
-    Sample* current = head;
+   int found = 0;
+   Sample* current = head;
 
-    while (current != NULL) {
-        // So sánh chuỗi thời gian
-        if (strcmp(current->timestamp, startTime) >= 0 &&
-            strcmp(current->timestamp, endTime) <= 0) {
-            
-            printf("%-20s %-10s %-10.2f %-10s\n", 
-                   current->timestamp, 
-                   current->tag, 
-                   current->value, 
-                   current->unit);
-            found++;
-        }
-        current = current->next;
-    }
-    
-    if (found == 0) printf("(Khong co du lieu)\n");
+   while (current != NULL) {
+      // Compare timestamp strings
+      if (strcmp(current->timestamp, startTime) >= 0 &&
+         strcmp(current->timestamp, endTime) <= 0) {
+         
+         printf("%-20s %-10s %-10.2f %-10s\n", 
+                  current->timestamp, 
+                  current->tag, 
+                  current->value, 
+                  current->unit);
+         found++;
+      }
+      current = current->next;
+   }
+   
+   if (found == 0) printf("(No data available)\n");
 }
 
-// Xóa theo Timestamp
+// Delete by Timestamp
 void deleteByTimestamp(Sample** head, char* targetTime) {
-    Sample* current = *head;
-    Sample* prev = NULL;
+   Sample* current = *head;
+   Sample* prev = NULL;
 
-    // Danh sách rỗng
-    if (current == NULL) return;
+   // Empty list
+   if (current == NULL) return;
 
-    // Trường hợp xóa đầu danh sách (Head)
-    if (strcmp(current->timestamp, targetTime) == 0) {
-        *head = current->next; // Cập nhật head mới
-        free(current);         // Giải phóng bộ nhớ
-        printf("Da xoa mau tai thoi diem: %s\n", targetTime);
-        return;
-    }
+   // Case: Delete head node
+   if (strcmp(current->timestamp, targetTime) == 0) {
+      *head = current->next; // Update head
+      free(current);         // Free memory
+      printf("Deleted sample at timestamp: %s\n", targetTime);
+      return;
+   }
 
-    // Trường hợp xóa ở giữa hoặc cuối
-    while (current != NULL && strcmp(current->timestamp, targetTime) != 0) {
-        prev = current;
-        current = current->next;
-    }
+   // Case: Delete middle or end node
+   while (current != NULL && strcmp(current->timestamp, targetTime) != 0) {
+      prev = current;
+      current = current->next;
+   }
 
-    // Không tìm thấy
-    if (current == NULL) {
-        printf("Khong tim thay mau can xoa!\n");
-        return;
-    }
+   // Not found
+   if (current == NULL) {
+      printf("Sample not found for deletion!\n");
+      return;
+   }
 
-    // Thực hiện xóa
-    prev->next = current->next;
-    free(current);
-    printf("Da xoa mau tai thoi diem: %s\n", targetTime);
+   // Perform deletion
+   prev->next = current->next;
+   free(current);
+   printf("Deleted sample at timestamp: %s\n", targetTime);
 }
 
-// Chuyển Linked List sang Mảng (Để hỗ trợ Sort)
+// Convert Linked List to Array (for sorting support)
 Sample* listToArray(Sample* head, int* count) {
-    // Bước 1: Đếm số lượng
-    int n = 0;
-    Sample* current = head;
-    while (current != NULL) {
-        n++;
-        current = current->next;
-    }
-    *count = n;
+   // Step 1: Count the number of nodes
+   int n = 0;
+   Sample* current = head;
+   while (current != NULL) {
+      n++;
+      current = current->next;
+   }
+   *count = n;
 
-    if (n == 0) return NULL;
+   if (n == 0) return NULL;
 
-    // Bước 2: Cấp phát mảng động
-    Sample* arr = (Sample*)malloc(n * sizeof(Sample));
-    if (arr == NULL) return NULL;
+   // Step 2: Allocate dynamic array
+   Sample* arr = (Sample*)malloc(n * sizeof(Sample));
+   if (arr == NULL) return NULL;
 
-    // Bước 3: Copy dữ liệu
-    current = head;
-    for (int i = 0; i < n; i++) {
-        // Copy toàn bộ nội dung struct
-        arr[i] = *current; 
-        
-        // Gán next trong mảng bằng NULL để tránh liên kết không mong muốn
-        arr[i].next = NULL; 
-        
-        current = current->next;
-    }
+   // Step 3: Copy data
+   current = head;
+   for (int i = 0; i < n; i++) {
+      // Copy entire struct content
+      arr[i] = *current; 
+      
+      // Set next to NULL to avoid unwanted links
+      arr[i].next = NULL; 
+      
+      current = current->next;
+   }
 
-    return arr;
+   return arr;
 }

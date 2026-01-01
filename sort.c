@@ -30,13 +30,20 @@ void sortByValue(Sample arr[], int n) {
       }
    }
 }
-int listToArray(Node *head, Sample arr[], int max) {
-    int i = 0;
-    while (head != NULL && i < max) {
-        arr[i++] = head->data;
-        head = head->next;
+// listToArray is now implemented in models.c
+// This function is kept for backward compatibility
+int listToArrayWrapper(Sample *head, Sample arr[], int max) {
+    int count = 0;
+    Sample* result = listToArray(head, &count);
+    if (result == NULL) return 0;
+    
+    int elementsToCopy = (count < max) ? count : max;
+    for (int i = 0; i < elementsToCopy; i++) {
+        arr[i] = result[i];
     }
-    return i;
+    
+    free(result);
+    return elementsToCopy;
 }
 void sortSamplesByTag(Sample arr[], int n) {
     for (int i = 0; i < n - 1; i++) {

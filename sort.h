@@ -5,5 +5,6 @@
 
 void sortByTimestamp(Sample arr[], int n);
 void sortByValue(Sample arr[], int n);
+void sortSamplesByTag(Sample arr[], int n);
 
 #endif

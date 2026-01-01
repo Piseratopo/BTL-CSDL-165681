@@ -20,11 +20,11 @@ static void printSampleArray(const char* title, const Sample* arr, int n) {
 
 static void runSortingAndTreeDemo(void) {
    Sample samples[] = {
-      {"2025-12-12 10:30", "T1", 30.5, "C"},
-      {"2025-12-12 10:35", "P1",  1.2, "bar"},
-      {"2025-12-12 10:32", "T2", 28.1, "C"},
-      {"2025-12-12 10:31", "T1", 31.0, "C"},
-      {"2025-12-12 10:33", "I3", 15.0, "A"},
+      {"2025-12-12 10:30", "T1", 30.5, "C", NULL},
+      {"2025-12-12 10:35", "P1",  1.2, "bar", NULL},
+      {"2025-12-12 10:32", "T2", 28.1, "C", NULL},
+      {"2025-12-12 10:31", "T1", 31.0, "C", NULL},
+      {"2025-12-12 10:33", "I3", 15.0, "A", NULL},
    };
    const int count = (int)(sizeof(samples) / sizeof(samples[0]));
 
@@ -66,15 +66,15 @@ static void runSortingAndTreeDemo(void) {
 static void runLoggerDemo(void) {
    Sample* logger = NULL;
    Sample dataset[] = {
-      {"2024-12-18 08:00", "TEMP_01", 30.5, "C"},
-      {"2024-12-18 08:05", "PRES_01",  2.1, "bar"},
-      {"2024-12-18 08:10", "VOLT_M", 220.0, "V"},
-      {"2024-12-18 08:15", "TEMP_01", 31.2, "C"},
-      {"2024-12-18 08:20", "PRES_01",  2.3, "bar"},
-      {"2024-12-18 08:25", "VOLT_M", 219.5, "V"},
-      {"2024-12-18 08:30", "TEMP_01", 32.0, "C"},
-      {"2024-12-18 08:35", "PRES_01",  2.4, "bar"},
-      {"2024-12-18 08:40", "VOLT_M", 221.0, "V"},
+      {"2024-12-18 08:00", "TEMP_01", 30.5, "C", NULL},
+      {"2024-12-18 08:05", "PRES_01",  2.1, "bar", NULL},
+      {"2024-12-18 08:10", "VOLT_M", 220.0, "V", NULL},
+      {"2024-12-18 08:15", "TEMP_01", 31.2, "C", NULL},
+      {"2024-12-18 08:20", "PRES_01",  2.3, "bar", NULL},
+      {"2024-12-18 08:25", "VOLT_M", 219.5, "V", NULL},
+      {"2024-12-18 08:30", "TEMP_01", 32.0, "C", NULL},
+      {"2024-12-18 08:35", "PRES_01",  2.4, "bar", NULL},
+      {"2024-12-18 08:40", "VOLT_M", 221.0, "V", NULL},
    };
    const size_t count = sizeof(dataset) / sizeof(dataset[0]);
 
