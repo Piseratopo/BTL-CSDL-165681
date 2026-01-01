@@ -9,8 +9,6 @@ int main() {
    TreeNode* root = NULL;
    int choice;
 
-   printf("=== SENSOR DATA MANAGEMENT SYSTEM ===\n");
-   
    do {
       displayMainMenu();
       if (scanf("%d", &choice) != 1) {
