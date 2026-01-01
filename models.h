@@ -34,8 +34,12 @@ void printSampleList(const Sample* head);
 void freeSampleList(Sample** head);
 
 // Week 2 functions
+void searchLinearByTag(const Sample* head, const char* tag);
 void searchByTimeRange(Sample* head, char* startTime, char* endTime);
 void deleteByTimestamp(Sample** head, char* targetTime);
 Sample* listToArray(Sample* head, int* count);
+
+// Week 3 functions
+void calculateStatsByTag(const Sample* head, const char* tag);
 
 #endif

@@ -117,7 +117,26 @@ void freeSampleList(Sample** head) {
    *head = NULL;
 }
 
-
+// Search by Tag
+void searchLinearByTag(const Sample* head, const char* tag) {
+   printf("\n--- TIM KIEM LICH SU DO CHO TAG: %s ---\n", tag);
+   printf("%-20s %-10s %-10s %-10s\n", "Timestamp", "Tag", "Value", "Unit");
+   int found = 0;
+   const Sample* current = head;
+   while (current != NULL) {
+      // So sánh chuỗi tag
+      if (strcmp(current->tag, tag) == 0) {
+         printf("%-20s %-10s %-10.2f %-10s\n",
+                  current->timestamp, 
+                  current->tag, 
+                  current->value, 
+                  current->unit);
+         found++;
+      }
+      current = current->next;
+   }
+   if (found == 0) printf("(Khong tim thay du lieu cho tag %s)\n", tag);
+}
 // Search by time range
 void searchByTimeRange(Sample* head, char* startTime, char* endTime) {
    printf("\n--- SEARCH FROM %s TO %s ---\n", startTime, endTime);
@@ -208,4 +227,56 @@ Sample* listToArray(Sample* head, int* count) {
    }
 
    return arr;
+}
+// Calculate statistics by Tag
+void calculateStatsByTag(const Sample* head, const char* tag) {
+   double minVal = 1e9, maxVal = -1e9, sum = 0;
+   int count = 0;
+   const Sample* current = head;
+
+   while (current != NULL) {
+      if (strcmp(current->tag, tag) == 0) {
+         if (current->value < minVal) minVal = current->value;
+         if (current->value > maxVal) maxVal = current->value;
+         sum += current->value;
+         count++;
+      }
+      current = current->next;
+   }
+
+   if (count > 0) {
+      printf("\n--- THONG KE DU LIEU CHO TAG: %s ---\n", tag);
+      printf("So luong mau: %d\n", count);
+      printf("Gia tri Min : %.2f\n", minVal);
+      printf("Gia tri Max : %.2f\n", maxVal);
+      printf("Trung binh  : %.2f\n", sum / count);
+   } else {
+      printf("Khong tim thay tag '%s' de thong ke.\n", tag);
+   }
+}
+// Save to CSV
+void saveToCSV(const Sample* head, const char* filename, const char* filterTag) {
+   FILE *f = fopen(filename, "w");
+   if (f == NULL) {
+      printf("Loi: Khong the tao hoac mo file '%s' de ghi!\n", filename);
+      return;
+   }
+   fprintf(f, "Timestamp,Tag,Value,Unit\n");
+
+   int count = 0;
+   const Sample* current = head;
+   while (current != NULL) {
+      if (filterTag == NULL || strlen(filterTag) == 0 || strcmp(current->tag, filterTag) == 0) {
+         fprintf(f, "%s,%s,%.2f,%s\n", 
+                 current->timestamp, 
+                 current->tag, 
+                 current->value, 
+                 current->unit);
+         count++;
+      }
+      current = current->next;
+   }
+
+   fclose(f);
+   printf("Da xuat %d dong du lieu ra file '%s' thanh cong.\n", count, filename);
 }

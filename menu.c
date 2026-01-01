@@ -11,6 +11,8 @@ void displayMainMenu() {
     printf("3. Search samples\n");
     printf("4. Sort samples\n");
     printf("5. Build and display BST\n");
+    printf("6. Statistics (Min/Max/Avg)\n");
+    printf("7. Export to CSV file\n");
     printf("0. Exit\n");
     printf("Enter your choice: ");
 }
@@ -31,6 +33,18 @@ void handleMenuChoice(int choice, Sample** sampleList, TreeNode** root) {
             break;
         case 5:
             buildTreeMenu(*sampleList, root);
+            break;
+        case 6:
+            {
+            char tag[MAX_TAG_LENGTH];
+            printf("Enter Tag to calculate stats: ");
+            fgets(tag, sizeof(tag), stdin);
+            tag[strcspn(tag, "\n")] = '\0';
+            calculateStatsByTag(*sampleList, tag);
+            }
+            break;
+        case 7:
+            exportMenu(*sampleList);
             break;
         case 0:
             printf("Exiting...\n");
@@ -63,24 +77,40 @@ void searchSamplesMenu(Sample* sampleList, TreeNode* root) {
 
     int choice;
     printf("\n=== SEARCH SAMPLES ===\n");
-    printf("1. Search by tag\n");
-    printf("2. Search by timestamp\n");
+    printf("1. Search by Tag (List all history)\n");
+    printf("2. Search by Time Range\n");            
     printf("Enter your choice: ");
     scanf("%d", &choice);
-    getchar(); // Consume newline
+    getchar();
+
+    char buffer[100];
 
     switch (choice) {
-        case 1:
-            searchByTag(root);
+        case 1: 
+            printf("Enter Tag to search: ");
+            fgets(buffer, sizeof(buffer), stdin);
+            buffer[strcspn(buffer, "\n")] = '\0';
+            searchLinearByTag(sampleList, buffer);
             break;
-        case 2:
-            searchByTimestamp(sampleList);
+
+        case 2: 
+            {
+                char start[MAX_TIMESTAMP_LENGTH], end[MAX_TIMESTAMP_LENGTH];
+                printf("Enter START time (YYYY-MM-DD HH:MM): ");
+                fgets(start, sizeof(start), stdin);
+                start[strcspn(start, "\n")] = '\0';
+                
+                printf("Enter END time   (YYYY-MM-DD HH:MM): ");
+                fgets(end, sizeof(end), stdin);
+                end[strcspn(end, "\n")] = '\0';
+                
+                searchByTimeRange(sampleList, start, end);
+            }
             break;
         default:
             printf("Invalid choice.\n");
     }
 }
-
 void sortSamplesMenu(Sample** sampleList) {
     if (*sampleList == NULL) {
         printf("No samples available to sort.\n");
@@ -239,4 +269,39 @@ void printSampleList(const Sample* head) {
         current = current->next;
     }
     printf("----------------------------------------------------------\n");
+}
+void exportMenu(Sample* sampleList) {
+    if (sampleList == NULL) {
+        printf("Danh sach rong, khong co gi de xuat file.\n");
+        return;
+    }
+
+    int choice;
+    char filename[100];
+    char tag[30];
+
+    printf("\n=== EXPORT TO CSV ===\n");
+    printf("1. Export ALL data\n");
+    printf("2. Export data by Tag\n");
+    printf("Enter choice: ");
+    scanf("%d", &choice);
+    getchar();
+
+    printf("Nhap ten file muon luu (vd: data.csv): ");
+    fgets(filename, sizeof(filename), stdin);
+    filename[strcspn(filename, "\n")] = '\0';
+
+    switch (choice) {
+        case 1:
+            saveToCSV(sampleList, filename, NULL);
+            break;
+        case 2:
+            printf("Nhap Tag muon in: ");
+            fgets(tag, sizeof(tag), stdin);
+            tag[strcspn(tag, "\n")] = '\0';
+            saveToCSV(sampleList, filename, tag);
+            break;
+        default:
+            printf("Lua chon khong hop le.\n");
+    }
 }
