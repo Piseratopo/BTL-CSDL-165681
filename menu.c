@@ -294,33 +294,50 @@ void printSampleList(const Sample* head) {
     }
     printf("----------------------------------------------------------\n");
 }
-
 void fileMenu(Sample** sampleList) {
     int choice;
     char filename[100];
+    char tag[MAX_TAG_LENGTH];
 
     printf("\n=== FILE OPERATIONS (CSV) ===\n");
-    printf("1. Export to CSV (Luu ra file)\n");
-    printf("2. Import from CSV (Doc tu file)\n");
+    printf("1. Export ALL data to CSV (Xuat tat ca)\n");
+    printf("2. Export by TAG to CSV (Bao cao rieng tung kenh) [NANG CAO]\n"); // <--- Thêm dòng này
+    printf("3. Import from CSV (Doc tu file)\n");
     printf("Enter choice: ");
     scanf("%d", &choice);
     getchar(); // Xóa bộ nhớ đệm
 
+    // Nhập tên file cho các chức năng Export/Import
     printf("Nhap ten file (vd: data.csv): ");
     fgets(filename, sizeof(filename), stdin);
     filename[strcspn(filename, "\n")] = '\0';
 
     switch (choice) {
-        case 1: // Export
+        case 1: // Export All
             if (*sampleList == NULL) {
                 printf("Danh sach rong, khong co gi de xuat.\n");
             } else {
-               
-                saveToCSV(*sampleList, filename, NULL); 
+                saveToCSV(*sampleList, filename, NULL); // NULL = In hết
             }
             break;
-        case 2: // Import
-            importFromCSV(sampleList, filename); 
+            
+        case 2: // Export by Tag (Tính năng bạn đang hỏi)
+            if (*sampleList == NULL) {
+                printf("Danh sach rong.\n");
+            } else {
+                printf("Nhap Tag muon in bao cao (vd: T1): ");
+                fgets(tag, sizeof(tag), stdin);
+                tag[strcspn(tag, "\n")] = '\0';
+                
+                // Gọi hàm saveToCSV với tham số tag để lọc
+                saveToCSV(*sampleList, filename, tag); 
+            }
+            break;
+
+        case 3: // Import
+            importFromCSV(sampleList, filename);
+            break;
+            
         default:
             printf("Lua chon khong hop le.\n");
     }
