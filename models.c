@@ -280,3 +280,56 @@ void saveToCSV(const Sample* head, const char* filename, const char* filterTag) 
    fclose(f);
    printf("Da xuat %d dong du lieu ra file '%s' thanh cong.\n", count, filename);
 }
+// Import from CSV
+void importFromCSV(Sample** head, const char* filename) {
+    FILE* f = fopen(filename, "r");
+    if (f == NULL) {
+        printf("Loi: Khong the mo file '%s' de doc!\n", filename);
+        return;
+    }
+
+    char line[256];
+    int count = 0;
+
+    fgets(line, sizeof(line), f);
+    while (fgets(line, sizeof(line), f)) {
+       
+        char timestamp[MAX_TIMESTAMP_LENGTH];
+        char tag[MAX_TAG_LENGTH];
+        char unit[MAX_UNIT_LENGTH];
+        double value = 0.0;
+
+        char* token = strtok(line, ",");
+        if (token == NULL) continue;
+        strncpy(timestamp, token, MAX_TIMESTAMP_LENGTH - 1);
+        timestamp[MAX_TIMESTAMP_LENGTH - 1] = '\0';
+
+        token = strtok(NULL, ",");
+        if (token == NULL) continue;
+        strncpy(tag, token, MAX_TAG_LENGTH - 1);
+        tag[MAX_TAG_LENGTH - 1] = '\0';
+
+        token = strtok(NULL, ",");
+        if (token == NULL) continue;
+        value = atof(token); 
+        token = strtok(NULL, ",");
+        if (token == NULL) continue;
+     
+        token[strcspn(token, "\n")] = '\0'; 
+        strncpy(unit, token, MAX_UNIT_LENGTH - 1);
+        unit[MAX_UNIT_LENGTH - 1] = '\0';
+
+        Sample temp;
+        strcpy(temp.timestamp, timestamp);
+        strcpy(temp.tag, tag);
+        temp.value = value;
+        strcpy(temp.unit, unit);
+        temp.next = NULL;
+
+        addSample(head, temp);
+        count++;
+    }
+
+    fclose(f);
+    printf("Da nhap thanh cong %d mau du lieu tu file '%s'.\n", count, filename);
+}

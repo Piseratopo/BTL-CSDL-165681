@@ -12,7 +12,7 @@ void displayMainMenu() {
     printf("4. Sort samples\n");
     printf("5. Build and display BST\n");
     printf("6. Statistics (Min/Max/Avg)\n");
-    printf("7. Export to CSV file\n");
+    printf("7. File Operations (Import/Export CSV)\n");
     printf("0. Exit\n");
     printf("Enter your choice: ");
 }
@@ -44,7 +44,7 @@ void handleMenuChoice(int choice, Sample** sampleList, TreeNode** root) {
             }
             break;
         case 7:
-            exportMenu(*sampleList);
+            fileMenu(sampleList);
             break;
         case 0:
             printf("Exiting...\n");
@@ -294,37 +294,33 @@ void printSampleList(const Sample* head) {
     }
     printf("----------------------------------------------------------\n");
 }
-void exportMenu(Sample* sampleList) {
-    if (sampleList == NULL) {
-        printf("Danh sach rong, khong co gi de xuat file.\n");
-        return;
-    }
 
+void fileMenu(Sample** sampleList) {
     int choice;
     char filename[100];
-    char tag[30];
 
-    printf("\n=== EXPORT TO CSV ===\n");
-    printf("1. Export ALL data\n");
-    printf("2. Export data by Tag\n");
+    printf("\n=== FILE OPERATIONS (CSV) ===\n");
+    printf("1. Export to CSV (Luu ra file)\n");
+    printf("2. Import from CSV (Doc tu file)\n");
     printf("Enter choice: ");
     scanf("%d", &choice);
-    getchar();
+    getchar(); // Xóa bộ nhớ đệm
 
-    printf("Nhap ten file muon luu (vd: data.csv): ");
+    printf("Nhap ten file (vd: data.csv): ");
     fgets(filename, sizeof(filename), stdin);
     filename[strcspn(filename, "\n")] = '\0';
 
     switch (choice) {
-        case 1:
-            saveToCSV(sampleList, filename, NULL);
+        case 1: // Export
+            if (*sampleList == NULL) {
+                printf("Danh sach rong, khong co gi de xuat.\n");
+            } else {
+               
+                saveToCSV(*sampleList, filename, NULL); 
+            }
             break;
-        case 2:
-            printf("Nhap Tag muon in: ");
-            fgets(tag, sizeof(tag), stdin);
-            tag[strcspn(tag, "\n")] = '\0';
-            saveToCSV(sampleList, filename, tag);
-            break;
+        case 2: // Import
+            importFromCSV(sampleList, filename); 
         default:
             printf("Lua chon khong hop le.\n");
     }

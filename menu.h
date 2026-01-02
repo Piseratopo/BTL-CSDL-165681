@@ -11,8 +11,6 @@ void listSamplesMenu(Sample* sampleList);
 void searchSamplesMenu(Sample* sampleList, TreeNode* root);
 void sortSamplesMenu(Sample** sampleList);
 void buildTreeMenu(Sample* sampleList, TreeNode** root);
-void searchByTag(TreeNode* root);
-void searchByTimestamp(Sample* sampleList);
-void exportMenu(Sample* sampleList);
+void fileMenu(Sample** sampleList);
 
 #endif

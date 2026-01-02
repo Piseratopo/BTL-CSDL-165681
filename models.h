@@ -42,5 +42,6 @@ Sample* listToArray(Sample* head, int* count);
 // Week 3 functions
 void calculateStatsByTag(const Sample* head, const char* tag);
 void saveToCSV(const Sample* head, const char* filename, const char* filterTag);
-
+// Import samples from a CSV file
+void importFromCSV(Sample** head, const char* filename);
 #endif
