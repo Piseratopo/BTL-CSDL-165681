@@ -13,6 +13,7 @@ void displayMainMenu() {
     printf("5. Build and display BST\n");
     printf("6. Statistics (Min/Max/Avg)\n");
     printf("7. File Operations (Import/Export CSV)\n");
+    printf("8. Delete Sample\n");
     printf("0. Exit\n");
     printf("Enter your choice: ");
 }
@@ -35,16 +36,13 @@ void handleMenuChoice(int choice, Sample** sampleList, TreeNode** root) {
             buildTreeMenu(*sampleList, root);
             break;
         case 6:
-            {
-            char tag[MAX_TAG_LENGTH];
-            printf("Enter Tag to calculate stats: ");
-            fgets(tag, sizeof(tag), stdin);
-            tag[strcspn(tag, "\n")] = '\0';
-            calculateStatsByTag(*sampleList, tag);
-            }
+            statsMenu(*sampleList);
             break;
         case 7:
             fileMenu(sampleList);
+            break;
+        case 8:
+            deleteMenu(sampleList);
             break;
         case 0:
             printf("Exiting...\n");
@@ -294,6 +292,20 @@ void printSampleList(const Sample* head) {
     }
     printf("----------------------------------------------------------\n");
 }
+void statsMenu(Sample* sampleList) {
+    if (sampleList == NULL) {
+        printf("No samples available for statistics.\n");
+        return;
+    }
+    
+    char tag[MAX_TAG_LENGTH];
+    printf("\n=== STATISTICS (MIN/MAX/AVG) ===\n");
+    printf("Enter Tag to calculate stats: ");
+    fgets(tag, sizeof(tag), stdin);
+    tag[strcspn(tag, "\n")] = '\0';
+    
+    calculateStatsByTag(sampleList, tag);
+}
 void fileMenu(Sample** sampleList) {
     int choice;
     char filename[100];
@@ -340,5 +352,47 @@ void fileMenu(Sample** sampleList) {
             
         default:
             printf("Lua chon khong hop le.\n");
+    }
+}
+// Delete Menu
+void deleteMenu(Sample** sampleList) {
+    if (*sampleList == NULL) {
+        printf("List is empty. Nothing to delete.\n");
+        return;
+    }
+
+    int delChoice;
+    printf("\n=== DELETE OPTIONS ===\n");
+    printf("1. Delete a specific sample (by Timestamp)\n");
+    printf("2. Clear ALL data (Reset system)\n");
+    printf("0. Cancel\n");
+    printf("Enter choice: ");
+    
+    scanf("%d", &delChoice);
+    getchar(); // Xóa bộ nhớ đệm
+
+    if (delChoice == 1) {
+        char timeBuffer[MAX_TIMESTAMP_LENGTH];
+        printf("Enter timestamp to delete (YYYY-MM-DD HH:MM): ");
+        fgets(timeBuffer, sizeof(timeBuffer), stdin);
+        timeBuffer[strcspn(timeBuffer, "\n")] = '\0';
+        
+        deleteByTimestamp(sampleList, timeBuffer);
+    } 
+    else if (delChoice == 2) {
+        char confirm;
+        printf("WARNING: This will delete ALL data. Are you sure? (y/n): ");
+        scanf("%c", &confirm);
+        getchar();
+        
+        if (confirm == 'y' || confirm == 'Y') {
+            freeSampleList(sampleList);
+            printf("All data has been cleared.\n");
+        } else {
+            printf("Operation cancelled.\n");
+        }
+    }
+    else {
+        printf("Return to Main Menu.\n");
     }
 }

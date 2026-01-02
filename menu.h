@@ -11,6 +11,7 @@ void listSamplesMenu(Sample* sampleList);
 void searchSamplesMenu(Sample* sampleList, TreeNode* root);
 void sortSamplesMenu(Sample** sampleList);
 void buildTreeMenu(Sample* sampleList, TreeNode** root);
+void statsMenu(Sample* sampleList);
 void fileMenu(Sample** sampleList);
-
+void deleteMenu(Sample** sampleList);
 #endif
