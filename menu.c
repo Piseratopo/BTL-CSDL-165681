@@ -75,9 +75,10 @@ void searchSamplesMenu(Sample* sampleList, TreeNode* root) {
 
     int choice;
     printf("\n=== SEARCH SAMPLES ===\n");
-    printf("1. Search by Tag (History - Linear Search) \n"); // Cách 1: Tìm hết lịch sử
-    printf("2. Search by Time Range (Linear Search)    \n"); // Cách 2: Tìm theo giờ
-    printf("3. Quick Lookup by Tag (BST Search)        \n"); // Cách 3: Tìm nhanh (BST)
+    printf("1. Search by Tag (History - Linear Search) \n");
+    printf("2. Search by Time Range (Linear Search)    \n");
+    printf("3. Quick Lookup by Tag (BST Search)        \n");
+    printf("0. Back to Main Menu\n");
     printf("Enter your choice: ");
     scanf("%d", &choice);
     getchar(); 
@@ -115,7 +116,6 @@ void searchSamplesMenu(Sample* sampleList, TreeNode* root) {
                 fgets(buffer, sizeof(buffer), stdin);
                 buffer[strcspn(buffer, "\n")] = '\0';
                 
-              
                 TreeNode* result = searchBST(root, buffer);
                 
                 if (result != NULL) {
@@ -128,11 +128,16 @@ void searchSamplesMenu(Sample* sampleList, TreeNode* root) {
                 }
             }
             break;
+            
+        case 0: // <--- Thêm case này để quay lại
+            printf("Returning to Main Menu...\n");
+            return;
 
         default:
             printf("Invalid choice.\n");
     }
 }
+
 void sortSamplesMenu(Sample** sampleList) {
     if (*sampleList == NULL) {
         printf("No samples available to sort.\n");
@@ -143,9 +148,15 @@ void sortSamplesMenu(Sample** sampleList) {
     printf("\n=== SORT SAMPLES ===\n");
     printf("1. Sort by timestamp\n");
     printf("2. Sort by value\n");
+    printf("0. Back to Main Menu\n");
     printf("Enter your choice: ");
     scanf("%d", &choice);
-    getchar(); // Consume newline
+    getchar();
+
+    if (choice == 0) {
+        return; 
+    }
+
 
     // Convert linked list to array for sorting
     int count = 0;
@@ -168,7 +179,7 @@ void sortSamplesMenu(Sample** sampleList) {
             break;
         default:
             printf("Invalid choice.\n");
-            free(samples);
+            free(samples); // Free memory before returning on invalid choice
             return;
     }
 
@@ -306,6 +317,7 @@ void statsMenu(Sample* sampleList) {
     
     calculateStatsByTag(sampleList, tag);
 }
+
 void fileMenu(Sample** sampleList) {
     int choice;
     char filename[100];
@@ -313,16 +325,24 @@ void fileMenu(Sample** sampleList) {
 
     printf("\n=== FILE OPERATIONS (CSV) ===\n");
     printf("1. Export ALL data to CSV (Xuat tat ca)\n");
-    printf("2. Export by TAG to CSV (Bao cao rieng tung kenh) [NANG CAO]\n"); // <--- Thêm dòng này
+    printf("2. Export by TAG to CSV (Bao cao rieng tung kenh)\n");
     printf("3. Import from CSV (Doc tu file)\n");
+    printf("0. Back to Main Menu\n");
     printf("Enter choice: ");
     scanf("%d", &choice);
-    getchar(); // Xóa bộ nhớ đệm
+    getchar(); 
 
-    // Nhập tên file cho các chức năng Export/Import
-    printf("Nhap ten file (vd: data.csv): ");
-    fgets(filename, sizeof(filename), stdin);
-    filename[strcspn(filename, "\n")] = '\0';
+    
+    if (choice == 0) return; 
+
+    if (choice >= 1 && choice <= 3) {
+        printf("Nhap ten file (vd: data.csv): ");
+        fgets(filename, sizeof(filename), stdin);
+        filename[strcspn(filename, "\n")] = '\0';
+    } else {
+        printf("Lua chon khong hop le.\n");
+        return;
+    }
 
     switch (choice) {
         case 1: // Export All
@@ -333,15 +353,13 @@ void fileMenu(Sample** sampleList) {
             }
             break;
             
-        case 2: // Export by Tag (Tính năng bạn đang hỏi)
+        case 2: // Export by Tag
             if (*sampleList == NULL) {
                 printf("Danh sach rong.\n");
             } else {
                 printf("Nhap Tag muon in bao cao (vd: T1): ");
                 fgets(tag, sizeof(tag), stdin);
                 tag[strcspn(tag, "\n")] = '\0';
-                
-                // Gọi hàm saveToCSV với tham số tag để lọc
                 saveToCSV(*sampleList, filename, tag); 
             }
             break;
@@ -349,12 +367,9 @@ void fileMenu(Sample** sampleList) {
         case 3: // Import
             importFromCSV(sampleList, filename);
             break;
-            
-        default:
-            printf("Lua chon khong hop le.\n");
     }
 }
-// Delete Menu
+
 void deleteMenu(Sample** sampleList) {
     if (*sampleList == NULL) {
         printf("List is empty. Nothing to delete.\n");
@@ -365,11 +380,11 @@ void deleteMenu(Sample** sampleList) {
     printf("\n=== DELETE OPTIONS ===\n");
     printf("1. Delete a specific sample (by Timestamp)\n");
     printf("2. Clear ALL data (Reset system)\n");
-    printf("0. Cancel\n");
+    printf("0. Back to Main Menu\n");
     printf("Enter choice: ");
     
     scanf("%d", &delChoice);
-    getchar(); // Xóa bộ nhớ đệm
+    getchar();
 
     if (delChoice == 1) {
         char timeBuffer[MAX_TIMESTAMP_LENGTH];
@@ -392,7 +407,10 @@ void deleteMenu(Sample** sampleList) {
             printf("Operation cancelled.\n");
         }
     }
+    else if (delChoice == 0) { 
+        return;
+    }
     else {
-        printf("Return to Main Menu.\n");
+        printf("Invalid choice. Returning to Main Menu.\n");
     }
 }
