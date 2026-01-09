@@ -52,7 +52,7 @@ void generateMockData(Sample** head) {
    printf("[INFO] Generated %d mock samples.\n", (int)count);
 }
 
-// --- TEST SCENARIO 1: DATA MANAGEMENT (SV2 Focus) ---
+// --- TEST SCENARIO 1: DATA MANAGEMENT ---
 void test_CoreFeatures(Sample* head) {
     printHeader("TEST SCENARIO 1: CORE FUNCTIONS & STATS (SV2)");
 
